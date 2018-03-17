@@ -1,0 +1,25 @@
+{
+  "name": "cordova-plugin-downloader",
+  "version": "0.0.1",
+  "description": "download using native",
+  "cordova": {
+    "id": "cordova.plugin.downloader",
+    "platforms": [
+      "android"
+    ]
+  },
+  "keywords": [
+    "ecosystem:cordova",
+    "cordova-android"
+  ],
+  "author": "zhangqingcai0815@gmail.com",
+  "license": "GPL",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shougao/Cordova-plugin-downloader.git"
+  },
+  "bugs": {
+    "url": "https://github.com/shougao/Cordova-plugin-downloader/issues"
+  },
+  "homepage": "https://github.com/shougao/Cordova-plugin-downloader#readme"
+}
