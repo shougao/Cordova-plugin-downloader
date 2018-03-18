@@ -1,10 +1,10 @@
 <?xml version='1.0' encoding='utf-8'?>
-<plugin id="cordova-plugin-downloader" version="0.0.1" 
+<plugin id="cordova-plugin-downloader2" version="0.0.1"
     xmlns="http://apache.org/cordova/ns/plugins/1.0" 
     xmlns:android="http://schemas.android.com/apk/res/android">
     <name>Downloader</name>
     <js-module name="Downloader" src="www/Downloader.js">
-        <clobbers target="cordova.plugins.Downloader" />
+        <clobbers target="Downloader" />
     </js-module>
     <platform name="android">
         <config-file parent="/*" target="res/xml/config.xml">
@@ -12,7 +12,22 @@
                 <param name="android-package" value="cordova.plugin.downloader.Downloader" />
             </feature>
         </config-file>
+
+        <config-file target="AndroidManifest.xml" parent="/manifest">
+            <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE"/>
+            <uses-permission android:name="android.permission.INTERNET" />
+            <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+            <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+            <!--SD卡写入数据权限-->
+            <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+            <!--SD卡创建与删除权限-->
+            <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS"/>
+            <!--DownloadManager-->
+            <uses-permission android:name="android.permission.ACCESS_DOWNLOAD_MANAGER"/>
+            <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+        </config-file>
+        
         <config-file parent="/*" target="AndroidManifest.xml"></config-file>
-        <source-file src="src/android/Downloader.java" target-dir="src/cordova/plugin/downloader/Downloader" />
+        <source-file src="src/android/Downloader.java" target-dir="src/cordova/plugin/downloader" />
     </platform>
 </plugin>

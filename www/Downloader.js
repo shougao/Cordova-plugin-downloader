@@ -1,5 +1,10 @@
 var exec = require('cordova/exec');
 
-exports.coolMethod = function (arg0, success, error) {
-    exec(success, error, 'Downloader', 'coolMethod', [arg0]);
+exports.setRefreshTime = function (arg0, success, error) {
+    console.log('zqc setRefreshTime');
+    cordova.exec(success, error, 'Downloader', 'setRefreshTime', [arg0]);
+};
+
+exports.download = function (arg0, success, error) {
+    cordova.exec(success, error, 'Downloader', 'download', [arg0]);
 };
