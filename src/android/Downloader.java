@@ -10,6 +10,7 @@ import org.apache.cordova.CallbackContext;
 import org.apache.cordova.PluginResult;
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -28,6 +29,9 @@ public class Downloader extends CordovaPlugin {
     private static final int UPDATE = 100;
     private static final int ERROR = 101;
 
+    public static final String KEY_UPDATE_PROGRESS = "UPDATE_PROGRESS";
+    public static final String KEY_FILE_PATH = "FILE_PATH";
+    public static final String KEY_ERROR = "ERROR";
 
     private boolean mStarted = false;
     private CallbackContext mCallbackContext;
@@ -39,8 +43,8 @@ public class Downloader extends CordovaPlugin {
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
         mCallbackContext = callbackContext;
         if (action.equals("download")) {
-            if(mStarted){
-                callbackMessage(false, "has download task in using.");
+            if (mStarted) {
+                callbackMessage(KEY_ERROR, "has download task in using.");
                 return false;
             }
             String message = args.getString(0);
@@ -55,21 +59,48 @@ public class Downloader extends CordovaPlugin {
         return false;
     }
 
-    private void callbackMessage(boolean successful, String message) {
+    private void callbackMessage(String key, String message) {
         if (mCallbackContext == null) {
             return;
         }
-        if (successful) {
-            PluginResult dataResult = new PluginResult(PluginResult.Status.OK, message);
-            dataResult.setKeepCallback(true);
-            mCallbackContext.sendPluginResult(dataResult);
-            return;
-        } else {
-            PluginResult dataResult = new PluginResult(PluginResult.Status.ERROR, message);
-            dataResult.setKeepCallback(true);
-            mCallbackContext.sendPluginResult(dataResult);
-            mCallbackContext = null;
-            return;
+        PluginResult dataResult;
+        JSONObject jsonObject = new JSONObject();
+
+        switch (key) {
+            case KEY_UPDATE_PROGRESS:
+                int progress = Integer.valueOf(message);
+                try {
+                    jsonObject.put(KEY_UPDATE_PROGRESS, progress);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                dataResult = new PluginResult(PluginResult.Status.OK, jsonObject);
+                dataResult.setKeepCallback(true);
+                mCallbackContext.sendPluginResult(dataResult);
+                break;
+
+            case KEY_FILE_PATH:
+                try {
+                    jsonObject.put(KEY_FILE_PATH, message);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                dataResult = new PluginResult(PluginResult.Status.OK, jsonObject);
+                dataResult.setKeepCallback(true);
+                mCallbackContext.sendPluginResult(dataResult);
+                break;
+
+            case KEY_ERROR:
+                try {
+                    jsonObject.put(KEY_ERROR, message);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                dataResult = new PluginResult(PluginResult.Status.ERROR, jsonObject);
+                dataResult.setKeepCallback(true);
+                mCallbackContext.sendPluginResult(dataResult);
+                mCallbackContext = null;
+                break;
         }
     }
 
@@ -98,10 +129,10 @@ public class Downloader extends CordovaPlugin {
         protected void onPostExecute(File file) {
             mStarted = false;
             if (file == null) {
-                callbackMessage(false, "download error.");
+                callbackMessage(KEY_ERROR, "no file in sd card error.");
             } else {
-                callbackMessage(true, String.valueOf(100));
-                callbackMessage(true, file.toString());
+                callbackMessage(KEY_UPDATE_PROGRESS, String.valueOf(100));
+                callbackMessage(KEY_FILE_PATH, file.toString());
             }
             mCallbackContext = null;
         }
@@ -112,10 +143,10 @@ public class Downloader extends CordovaPlugin {
             switch (values[0]) {
                 case UPDATE:
                     int progressValue = values[1];
-                    callbackMessage(true, String.valueOf(progressValue));
+                    callbackMessage(KEY_UPDATE_PROGRESS, String.valueOf(progressValue));
                     break;
                 case ERROR:
-                    callbackMessage(false, "net work error, response code =" + values[1]);
+                    callbackMessage(KEY_ERROR, "net work error, response code =" + values[1]);
                     break;
             }
         }
@@ -153,12 +184,12 @@ public class Downloader extends CordovaPlugin {
                 bos.close();
                 bis.close();
             } catch (NullPointerException e) {
-                callbackMessage(false, "download logic NPE.");
+                callbackMessage(KEY_ERROR, "download logic NPE.");
                 e.printStackTrace();
             } catch (MalformedURLException e) {
-                callbackMessage(false, "url format error.");
+                callbackMessage(KEY_ERROR, "url format error.");
             } catch (IOException e) {
-                callbackMessage(false, "network error.");
+                callbackMessage(KEY_ERROR, "network error.");
             } finally {
                 if (connection != null)
                     connection.disconnect();

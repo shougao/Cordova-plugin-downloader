@@ -1,6 +1,6 @@
 {
   "name": "cordova-plugin-downloader2",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "download using native",
   "cordova": {
     "id": "cordova.plugin.downloader",

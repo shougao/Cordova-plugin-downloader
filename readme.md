@@ -21,14 +21,12 @@ url = "http://yourcompany.com/abc.apk";
 Downloader.download(url, success, error);
 ```
 
-the out put is below, when progress is 100 you will get the file path in storage.
+the out put is json object, please using key ``UPDATE_PROGRESS``,``FILE_PATH`` and  ``ERROR`` to get the result.
 ```
-progress = 14
-progress = 39
-progress = 58
-progress = 79
-progress = 100
-/storage/emulated/0/Download/abc.apk
+{"UPDATE_PROGRESS":3}
+{"UPDATE_PROGRESS":23}
+{"UPDATE_PROGRESS":58}
+{"UPDATE_PROGRESS":100}
 ```
 the default refresh download progress is 500ms, you could set the timer using ``setRefreshTime``
 ```
