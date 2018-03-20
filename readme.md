@@ -32,3 +32,8 @@ the default refresh download progress is 500ms, you could set the timer using ``
 ```
 Downloader.setRefreshTime(1000);
 ```
+this plugin need get the two android premission
+```
+<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+```

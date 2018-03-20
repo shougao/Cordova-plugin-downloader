@@ -66,41 +66,38 @@ public class Downloader extends CordovaPlugin {
         PluginResult dataResult;
         JSONObject jsonObject = new JSONObject();
 
-        switch (key) {
-            case KEY_UPDATE_PROGRESS:
-                int progress = Integer.valueOf(message);
-                try {
-                    jsonObject.put(KEY_UPDATE_PROGRESS, progress);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                dataResult = new PluginResult(PluginResult.Status.OK, jsonObject);
-                dataResult.setKeepCallback(true);
-                mCallbackContext.sendPluginResult(dataResult);
-                break;
-
-            case KEY_FILE_PATH:
-                try {
-                    jsonObject.put(KEY_FILE_PATH, message);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                dataResult = new PluginResult(PluginResult.Status.OK, jsonObject);
-                dataResult.setKeepCallback(true);
-                mCallbackContext.sendPluginResult(dataResult);
-                break;
-
-            case KEY_ERROR:
-                try {
-                    jsonObject.put(KEY_ERROR, message);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                dataResult = new PluginResult(PluginResult.Status.ERROR, jsonObject);
-                dataResult.setKeepCallback(true);
-                mCallbackContext.sendPluginResult(dataResult);
-                mCallbackContext = null;
-                break;
+        if (key.equals(KEY_UPDATE_PROGRESS)) {
+            int progress = Integer.valueOf(message);
+            try {
+                jsonObject.put(KEY_UPDATE_PROGRESS, progress);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            dataResult = new PluginResult(PluginResult.Status.OK, jsonObject);
+            dataResult.setKeepCallback(true);
+            mCallbackContext.sendPluginResult(dataResult);
+            return;
+        } else if (key.equals(KEY_FILE_PATH)) {
+            try {
+                jsonObject.put(KEY_FILE_PATH, message);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            dataResult = new PluginResult(PluginResult.Status.OK, jsonObject);
+            dataResult.setKeepCallback(true);
+            mCallbackContext.sendPluginResult(dataResult);
+            return;
+        } else if (key.equals(KEY_ERROR)) {
+            try {
+                jsonObject.put(KEY_ERROR, message);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            dataResult = new PluginResult(PluginResult.Status.ERROR, jsonObject);
+            dataResult.setKeepCallback(true);
+            mCallbackContext.sendPluginResult(dataResult);
+            mCallbackContext = null;
+            return;
         }
     }
 
