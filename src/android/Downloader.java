@@ -33,7 +33,7 @@ public class Downloader extends CordovaPlugin {
     public static final String KEY_FILE_PATH = "FILE_PATH";
     public static final String KEY_ERROR = "ERROR";
 
-    private boolean mStarted = false;
+    private static boolean mStarted = false;
     private CallbackContext mCallbackContext;
     private int mRefreshTime = 500;
     private static final int MIN_REFRESH_TIME = 100;
@@ -188,8 +188,10 @@ public class Downloader extends CordovaPlugin {
             } catch (IOException e) {
                 callbackMessage(KEY_ERROR, "network error.");
             } finally {
-                if (connection != null)
+                if (connection != null){
                     connection.disconnect();
+                }
+                mStarted = false;
             }
             return targetFile;
         }
