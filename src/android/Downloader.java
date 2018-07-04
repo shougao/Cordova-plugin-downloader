@@ -17,9 +17,11 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLDecoder;
 
 /**
  * This class echoes a string called from JavaScript.
@@ -161,8 +163,8 @@ public class Downloader extends CordovaPlugin {
                     publishProgress(ERROR, connection.getResponseCode());
                     return null;
                 }
-                int contentLen = connection.getContentLength();
-                int sumLength = 0;
+                double contentLen = connection.getContentLength();
+                double sumLength = 0;
 
                 BufferedInputStream bis = new BufferedInputStream(connection.getInputStream());
                 targetFile = new File(Environment.getExternalStorageDirectory() + "/Download/" + getFileName(url.toString()));
@@ -175,7 +177,7 @@ public class Downloader extends CordovaPlugin {
                     sumLength += len;
                     if ((System.currentTimeMillis() - marktime) > mRefreshTime) {
                         marktime = System.currentTimeMillis();
-                        publishProgress(UPDATE, sumLength * 100 / contentLen);
+                        publishProgress(UPDATE, (int)(sumLength * 100 / contentLen));
                     }
                 }
                 bos.close();
@@ -200,6 +202,11 @@ public class Downloader extends CordovaPlugin {
             String fileName = url.substring(url.lastIndexOf("/") + 1, url.length());
             if (TextUtils.isEmpty(fileName) && !fileName.contains(".apk")) {
                 fileName = cordova.getActivity().getPackageName() + ".apk";
+            }
+            try {
+                fileName = URLDecoder.decode(fileName, "UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
             }
             return fileName;
         }
