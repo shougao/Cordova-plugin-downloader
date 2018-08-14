@@ -37,3 +37,13 @@ this plugin need get the two android premission
 <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 ```
+
+
+```
+Downloader.getIMEI(success, failed);
+```
+this plugin need get telephony android premission
+```
+<uses-permission android:name="android.permission.READ_PHONE_STATE" />
+```
+

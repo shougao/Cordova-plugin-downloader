@@ -25,6 +25,8 @@
             <!--DownloadManager-->
             <uses-permission android:name="android.permission.ACCESS_DOWNLOAD_MANAGER"/>
             <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+            <!---for IMEI-->
+            <uses-permission android:name="android.permission.READ_PHONE_STATE" />
         </config-file>
         
         <config-file parent="/*" target="AndroidManifest.xml"></config-file>

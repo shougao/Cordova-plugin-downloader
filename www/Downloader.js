@@ -8,3 +8,7 @@ exports.setRefreshTime = function (arg0, success, error) {
 exports.download = function (arg0, success, error) {
     cordova.exec(success, error, 'Downloader', 'download', [arg0]);
 };
+
+exports.getIMEI = function (arg0, success, error) {
+    cordova.exec(success, error, 'Downloader', 'getIMEI', null);
+};

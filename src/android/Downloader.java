@@ -2,6 +2,7 @@ package cordova.plugin.downloader;
 
 import android.os.AsyncTask;
 import android.os.Environment;
+import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 
 import org.apache.cordova.CordovaPlugin;
@@ -56,6 +57,11 @@ public class Downloader extends CordovaPlugin {
         } else if (action.equals("setRefreshTime")) {
             int time = args.getInt(0);
             mRefreshTime = time > MIN_REFRESH_TIME ? time : mRefreshTime;
+            return true;
+        } else if (action.equals("getIMEI")) {
+            final TelephonyManager mTelephony = (TelephonyManager) cordova.getActivity().getSystemService(cordova.getActivity().TELEPHONY_SERVICE);
+            String imei = mTelephony.getDeviceId();
+            mCallbackContext.success(imei);
             return true;
         }
         return false;
