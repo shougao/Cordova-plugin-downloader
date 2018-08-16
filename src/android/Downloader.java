@@ -2,7 +2,6 @@ package cordova.plugin.downloader;
 
 import android.os.AsyncTask;
 import android.os.Environment;
-import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 
 import org.apache.cordova.CordovaPlugin;
@@ -21,8 +20,13 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.NetworkInterface;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * This class echoes a string called from JavaScript.
@@ -59,12 +63,73 @@ public class Downloader extends CordovaPlugin {
             mRefreshTime = time > MIN_REFRESH_TIME ? time : mRefreshTime;
             return true;
         } else if (action.equals("getIMEI")) {
-            final TelephonyManager mTelephony = (TelephonyManager) cordova.getActivity().getSystemService(cordova.getActivity().TELEPHONY_SERVICE);
-            String imei = mTelephony.getDeviceId();
-            mCallbackContext.success(imei);
+            String deviceId = getDeviceId();
+            mCallbackContext.success(deviceId);
             return true;
         }
         return false;
+    }
+
+    private String getDeviceId() {
+        String idString = getLanMac() + getWlanMac();
+        return getMd5(idString);
+    }
+
+    public String getMd5(final String string) {
+        try {
+            // Create MD5 Hash
+            MessageDigest digest = java.security.MessageDigest.getInstance("MD5");
+            digest.update(string.getBytes());
+            byte messageDigest[] = digest.digest();
+
+            // Create Hex String
+            StringBuffer hexString = new StringBuffer();
+            for (int i = 0; i < messageDigest.length; i++)
+                hexString.append(Integer.toHexString(0xFF & messageDigest[i]));
+            return hexString.toString();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
+
+    public String getLanMac() {
+        String mac = getMac("eth0");
+        System.out.println("eth0 mac : " + mac);
+        return mac;
+    }
+
+    private String getWlanMac() {
+        String mac = getMac("wlan0");
+        System.out.println("wlan0 mac : " + mac);
+        return mac;
+    }
+
+    private String getMac(String interfaceName) {
+        try {
+            List<NetworkInterface> interfaces = Collections.list(NetworkInterface.getNetworkInterfaces());
+            for (NetworkInterface intf : interfaces) {
+                if (!intf.getName().equalsIgnoreCase(interfaceName)) {
+                    continue;
+                }
+
+                byte[] mac = intf.getHardwareAddress();
+                if (mac == null) {
+                    return "";
+                }
+
+                StringBuilder buf = new StringBuilder();
+                for (byte aMac : mac) {
+                    buf.append(String.format("%02X:", aMac));
+                }
+                if (buf.length() > 0) {
+                    buf.deleteCharAt(buf.length() - 1);
+                }
+                return buf.toString();
+            }
+        } catch (Exception ex) {
+        } // for now eat exceptions
+        return "";
     }
 
     private void callbackMessage(String key, String message) {
