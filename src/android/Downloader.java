@@ -4,6 +4,10 @@ import android.os.AsyncTask;
 import android.os.Environment;
 import android.text.TextUtils;
 
+import com.arialyy.annotations.Download;
+import com.arialyy.aria.core.Aria;
+import com.arialyy.aria.core.download.DownloadTask;
+
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.CallbackContext;
 
@@ -27,6 +31,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Collections;
 import java.util.List;
+
 
 /**
  * This class echoes a string called from JavaScript.
@@ -54,9 +59,11 @@ public class Downloader extends CordovaPlugin {
                 callbackMessage(KEY_ERROR, "has download task in using.");
                 return false;
             }
-            String message = args.getString(0);
+            Aria.init(cordova.getContext());
+            Aria.download(this).register();
+            String url = args.getString(0);
             mStarted = true;
-            this.download(message, callbackContext);
+            this.download(url, callbackContext);
             return true;
         } else if (action.equals("setRefreshTime")) {
             int time = args.getInt(0);
@@ -174,14 +181,31 @@ public class Downloader extends CordovaPlugin {
         }
     }
 
-    private void download(String message, CallbackContext callbackContext) {
-        mStarted = true;
-        if (message != null && message.length() > 0) {
-            new DownloadTask().execute(message);
+    private void download(String url, CallbackContext callbackContext) {
+        if (url != null) {
+            String downloadPath = Environment.getExternalStorageDirectory() + "/Download/" + getFileName(url.toString());
+
+            Aria.download(this)
+                    .load(url)     //读取下载地址
+                    .setFilePath(downloadPath) //设置文件保存的完整路径
+                    .start();   //启动下载
         } else {
+            mStarted = true;
             callbackContext.error("Expected one non-empty string argument.");
         }
     }
+
+    //在这里处理任务执行中的状态，如进度进度条的刷新
+    @Download.onTaskRunning protected void running(DownloadTask task) {
+        int progressValue = task.getPercent();	//任务进度百分比
+        callbackMessage(KEY_UPDATE_PROGRESS, String.valueOf(progressValue));
+    }
+
+    @Download.onTaskComplete void taskComplete(DownloadTask task) {
+        callbackMessage(KEY_UPDATE_PROGRESS, String.valueOf(100));
+        mStarted = false;
+    }
+/*
 
     public class DownloadTask extends AsyncTask<String, Integer, File> {
 
@@ -269,17 +293,19 @@ public class Downloader extends CordovaPlugin {
             return targetFile;
         }
 
-        private String getFileName(String url) {
-            String fileName = url.substring(url.lastIndexOf("/") + 1, url.length());
-            if (TextUtils.isEmpty(fileName) && !fileName.contains(".apk")) {
-                fileName = cordova.getActivity().getPackageName() + ".apk";
-            }
-            try {
-                fileName = URLDecoder.decode(fileName, "UTF-8");
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
-            }
-            return fileName;
+    }
+*/
+
+    private String getFileName(String url) {
+        String fileName = url.substring(url.lastIndexOf("/") + 1, url.length());
+        if (TextUtils.isEmpty(fileName) && !fileName.contains(".apk")) {
+            fileName = cordova.getActivity().getPackageName() + ".apk";
         }
+        try {
+            fileName = URLDecoder.decode(fileName, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        return fileName;
     }
 }
